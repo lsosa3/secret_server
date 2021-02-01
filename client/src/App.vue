@@ -54,11 +54,12 @@ export default {
 				alert("Please fill the form");
 				return false
 			}
-			await axios.post('api/secret/', { 
+			let response = await axios.post('api/secret/', { 
 				secretText: this.description, 
 				remainingViews: this.views,
 				ttl: this.ttl
 			});
+			alert("Your has is: " + response.data.hash);
 			this.description = "";
 			this.views = "";
 			this.ttl = "";

@@ -30,8 +30,8 @@ const SecretsListSchema = new Schema(
 /*var encKey = process.env.SOME_32BYTE_BASE64_STRING
 var sigKey = process.env.SOME_64BYTE_BASE64_STRING
 
-SecretsListSchema.plugin(encrypt, { requireAuthenticationCode: false, encryptionKey: encKey, signingKey: sigKey, encryptedFields: ['secretText'] })*/
-
+SecretsListSchema.plugin(encrypt, { requireAuthentication: false, encryptionKey: encKey, signingKey: sigKey, encryptedFields: ['secretText'] })
+*/
 const SecretsList = model('secretsList', SecretsListSchema)
 
 module.exports = SecretsList
