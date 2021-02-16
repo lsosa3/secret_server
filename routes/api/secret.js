@@ -19,31 +19,10 @@ router.get('/', async (req, res) => {
     
 })
 
-router.post('/', newSecret, async (req, res) => {
-    const newSecretsList = new SecretsList(req.body)
-    try {
-        const secretsList = await newSecretsList.save()
-        if(!secretsList) throw new Error('Something went wrong saving the secret')
-        res.status(200).json(secretsList)
-    } catch (error) {
-        res.status(500).json({ message: error.message })
-    }
-})
+router.post('/', newSecret)
 
-router.get('/:hash', viewSecret, async (req, res) => {
-    const { hash } = req.params
-    try {
-        const exclude = { 
-            __v: false,
-            _id: false
-        };
-        const secret = await SecretsList.find({hash: hash}, exclude)
-        if(!secret) throw new Error('Something went wrong')
-        res.status(200).json(secret)
-    } catch (error) {
-        res.status(500).json({ message: error.message })
-    }
-})
+router.get('/:hash', viewSecret)
+
 router.put('/:id', async (req, res) => {
     const { id } = req.params
     try {

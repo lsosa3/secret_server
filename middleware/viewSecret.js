@@ -1,36 +1,30 @@
 const SecretsList = require('../models/SecretsList')
 
-module.exports = function viewSecret(req, res, next) {
-    let oldSend = res.send
-    let dats = []
-    res.send = function (data) {
-        try {
-            dats = JSON.parse(data)
-            dats = dats[0]
-            let now = new Date()
-            let timestamp = Date.parse(dats.expiresAt)
-            let timestamp0 = Date.parse("1970-01-01")
-            let expiresAt = new Date(timestamp)
-            let initTime = new Date(timestamp0)
-            res.send = oldSend
-            if(((now > expiresAt) && (expiresAt != initTime)) || (dats.remainingViews <= 0)){
-                return res.send(false)
-            }
-            dats.remainingViews--
-            SecretsList.updateOne({hash: dats.hash}, dats).then(
-                () => {
-                    console.log('Updated')
-                }
-            ).catch(
-                (error) => {
-                    console.log(error)
-                }
-            );
+async function viewSecret(req, res) {
+    const { hash } = req.params
+    try {
+        const exclude = { 
+            __v: false,
+            _id: false
+        };
+        const secret = await SecretsList.find({hash: hash}, exclude)
+        if(!secret) throw new Error('Something went wrong')
+        let secreto = secret[0]
+        let now = new Date()
+        let timestamp = Date.parse(secreto.expiresAt)
+        let timestamp0 = Date.parse("1970-01-01")
+        let expiresAt = new Date(timestamp)
+        let initTime = new Date(timestamp0)
+        if(((now > expiresAt) && (expiresAt != initTime)) || (secreto.remainingViews <= 0)){
+            return res.send(false)
         }
-        catch(error) {
-            console.log(error.message)
-        }
-        return res.send(data)
+        secreto.remainingViews--
+        const updateSecret = await SecretsList.updateOne({hash: secreto.hash}, secreto)
+        if(!updateSecret) throw new Error('Something went wrong update')
+        res.status(200).json(secret)
+    } catch (error) {
+        res.status(500).json({ message: error.message })
     }
-    next()
-};
+}
+
+module.exports = viewSecret;
